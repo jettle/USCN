@@ -1,4 +1,6 @@
 ﻿<?php
+ >>说明：1.开发环境：Window 8.1/Wamp/Sublime Text3/Mysql.（注：此项目使用的是Mysql数据库，因而数据库的相关文件后续发布）
+ 
 /*说明：MVC---View处理页面；Control处理业务逻辑；Model处理数据。
 *注：其中，Control或Model中的函数包括另外文件函数的调用，如：Folder:function,此文件包括大部分的核心（core)函数。
 例如：>>用户点击“添加留言”。
