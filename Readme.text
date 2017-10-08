@@ -1,0 +1,153 @@
+﻿<?php
+/*说明：MVC---View处理页面；Control处理业务逻辑；Model处理数据。
+*注：其中，Control或Model中的函数包括另外文件函数的调用，如：Folder:function,此文件包括大部分的核心（core)函数。
+例如：>>用户点击“添加留言”。
+      >>Control控制器（控制器选择并获取将要执行的方法，其方法中则开始调用public class Model或public class View中的方法。）
+      public class Control
+          {
+           public function add(){
+                   //声明public class Model对象
+                   $modle = new Model();
+                   //调用方法，作用：将控制器选择并获得的$data作为参数传入数据库
+                   $model->insert($data);
+                   //声明public class View对象
+                   $view = new View();
+                   //调用方法，作用：跳转至指定的Html页面。
+                   $view->show();
+           }
+MVC优点：
+        1.以往，我们大多数都是将网站根目录下创建多个.php文件，导致“逻辑”/“数据”文件混淆不清；而MVC软件设计模式将“业务逻辑”、“视图”和“数据”分隔开来，有助于整体调试。
+        2.其中，Control或Model或View都可以作为相关的接口。如：用于“用户登陆”的mvc，可以作为其他软件的接口。
+
+总之，不管是何种模式或思想的诞生，都是前人对于如何更好的解决问题的一种途径，用于后人对于类似问题的解决具有参考价值。算法——解决方法。
+*/
+/*
+**对于MVC的理解：假设，只提供一个唯一的入口文件（index.php）；则，可存在多个控制器（Control）、模型（Model）、视图(View)。
+ 即：1.用户指令选择对应的控制器。
+     2.控制器选择对应的模型。
+     3.模型返回数据给控制器。
+     4.控制器选择对应的视图(或提供数据)。
+     5.视图返回结果给用户。
+
+     注：入口文件能够解析URL，通过解析URL所得到的变量和变量值来选择对应的控制器及控制器中的方法。
+         如：URL：http:/index.php?control=indexControl&method=index.
+         变量：control/method
+         变量值：indexControl/index
+
+         入口文件(index.php)解析URL，即选择indexControl这个控制器和其中index方法。
+*/
+
+/*
+***总结：
+Ⅰ.基于MVC架构的网站"目录"结构，如下：
+www
+ --app
+     ---control
+          ----indexControl.class.php
+     ---model
+          ----indexModel.class.php
+     ---view
+          ----indexView.class.php
+          ----index.html
+          ----login.html
+ --core
+     ---db
+          ----mysql.class.php
+ --css
+ --func
+     ---coreFunction.class.php
+ --images
+     ---build.jpg
+ --js
+ index.php
+ intro.text
+
+ *说明：
+    关于www文件夹，包含：app、core、css、func、images、js，6个文件夹及index.html、index.php、intro.text，3个文件。
+ 文件夹：
+    1.www/app：包含control、model、view，3个文件夹，即是MVC。
+         control(控制器)、model（模型）、view(视图)。
+    MVC路径:
+    M: www/app/control/indexControl.class.php （业务逻辑）
+    V: www/app/view/indexView.class.php  （视图）
+    C: www/app/model/indexModel.class.php  （数据）
+
+    2.www/core: 包含核心的操作类文件，如：dataBase.class.php（数据库操作类文件）。
+
+    3.www/css: 包含.css样式文件。
+
+    4.www/func: 包含一些比较分散的、难以封装成特定类的核心函数，如：coreFunction.class.php（函数库文件）。
+
+    5.www/images: 包含一些网站所需的图片素材。
+
+    6.www/js: 包含.js脚本文件。
+
+    7.home.php: 网站的首页，即“首页”。
+
+    8.index.php: 网站URL的解析文件，即根据URL中的参数来选择对应的控制器及控制器中的方法。
+
+    9.intro.text: 记录文件。
+
+Ⅱ.命名规范：
+    1.所有"文件夹",均以英文小写命名，如：www/app/control。
+    2.所有的"类文件"，均以驼峰式命名，如：indexControl.class.php。
+    3.所有的类文件中的"命名空间"，均以其上一层文件夹名命名。如：www/app/control/indexControl.class.php:
+                                   namespase control;
+                                   class indexControl{
+                                       static public function run(){
+                                            echo "hello world.";
+                                       }
+                                   }
+    4.所有的类文件中的"类"，均以文件名.class.php前半部分命名。如：indexModel.class.php:
+                namespase model;
+                class indexModel{
+                   static public function run(){
+                      echo "hello world.";
+                   }
+                }
+Ⅲ运行流程（原理或思路）：
+    
+    URL（地址栏输入：http://index.php或http://index.php?control=indexControl&method=index）
+
+    index.php（解析URL,依据参数选择对应的控制器及其方法---通过调用“函数库方法”。 
+    /**
+       //引用核心函数库 
+       include_once("/wamp/www/func/coreFunction.class.php");
+       //选择控制器及其方法
+       \func\coreFunction::choose_control($_REQUEST["control"],$_REQUEST["method"]);）
+    */
+
+    indexControl.class.php（控制器，获取model的数据data，将data作为参数传给view方法。）
+    /**
+    static public function index(){
+        //引用核心函数库
+      include_once("/wamp/www/func/coreFunction.class.php");
+        //选择模型并获取数据data
+        $model = "indexModel";
+        $method = "index";
+        $data = \func\coreFunction::choose_model($model,$method);
+        //echo $data;
+       if(!empty($data)){
+
+        //选择视图
+        $view = "indexView";
+        $method = "display";
+        $filename = "index.html";
+        \func\coreFunction::choose_view($view,$method,$filename,$data);
+       }
+       else
+       {
+          echo ("Notice:no find data come from DB that is used!!!");
+       }
+      }
+*/
+      注：核心函数库中的choose_view($view,$method,$filename,$data)方法有4个参数，如果，不需要使用Model中的数据data,则可将$data=true;解决参数不匹配的报错问题。
+      *对于变量在html中的没有输出的问题？1.确定是否有echo语句。2.是否将文件设置为.php文件。3.确定是否使用<?php?>。
+
+?>
+<?
+@jettle 2017-09-03
+1.Control主要是作为控制器用于选择Model,Model获取数据给Control,Control传数据给View,Control显示对应View.
+
+2.减少数据库的访问量来优化
+?>
